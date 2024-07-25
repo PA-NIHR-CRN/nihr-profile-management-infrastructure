@@ -22,7 +22,7 @@ jobs:
         
     - name: Terraform Init - Dev
       run: |
-        terraform init -backend-config="bucket=${{ secrets.NIHR_DEV_TERRAFORM_BUCKET }}" -backend-config="key=rddi-study-management/dev/terraform.tfstate"
+        terraform init -backend-config="bucket=${{ secrets.NIHR_DEV_TERRAFORM_BUCKET }}" -backend-config="key=profile-management/dev/terraform.tfstate"
         
     - name: Terraform Validate - Dev
       run: |

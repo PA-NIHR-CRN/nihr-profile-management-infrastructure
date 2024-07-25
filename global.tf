@@ -2,13 +2,13 @@ variable "names" {
   default = {
     "retention_in_days" = "30"
     "proj"              = "nihr"
-    "system"            = "rddi-study-management"
-    "app"               = "rddi-study-management"
+    "system"            = "profile-management"
+    "app"               = "profile-management"
 
     "dev" = {
       "accountidentifiers"            = "nihrd"
       "environment"                   = "dev"
-      "app"                           = "rddi-study-management"
+      "app"                           = "profile-management"
       "backupretentionperiod"         = 7
       "engine"                        = "mysql"
       "engine_version"                = "8.0.mysql_aurora.3.06.0"

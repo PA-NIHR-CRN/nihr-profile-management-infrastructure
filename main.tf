@@ -12,9 +12,10 @@ locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
-module "profile_management_ecr" {
+
+module "profile_management_outbox_service_ecr" {
   source    = "github.com/PA-NIHR-CRN/terraform-modules//ecr?ref=v1.0.0"
-  repo_name = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-ecr-repository"
+  repo_name = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-outbox-service-ecr"
   env       = var.env
   app       = var.names["${var.env}"]["app"]
   account   = var.names["${var.env}"]["accountidentifiers"]

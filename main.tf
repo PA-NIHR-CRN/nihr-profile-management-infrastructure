@@ -17,4 +17,6 @@ module "profile_management_ecr" {
   repo_name = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-ecr-repository"
   env       = var.env
   app       = var.names["${var.env}"]["app"]
+  account   = var.names["${var.env}"]["accountidentifiers"]
+  system    = var.names["system"]
 }

@@ -96,13 +96,13 @@ variable "lambda_sg" {
 
 }
 
-variable "signup_lambda_sg" {
+# variable "signup_lambda_sg" {
 
-}
+# }
 
-variable "ecs_sg" {
+# variable "ecs_sg" {
 
-}
+# }
 # variable "capacity" {
 #   default = null
 

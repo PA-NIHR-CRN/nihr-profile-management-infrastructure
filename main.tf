@@ -8,6 +8,8 @@ terraform {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 locals {
   account_id = data.aws_caller_identity.current.account_id
 }
@@ -54,7 +56,7 @@ module "lambda_api_function" {
   runtime         = "dotnet8"
 
   environment_variables = {
-    "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pool.selected.endpoint}",
+    "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pool.selected.domain}.auth.${data.aws_region.current.name}.amazoncognito.com",
     "Data__ConnectionString"                     = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.db_name};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
     "Data__PasswordSecretName"                   = var.rds_password_secret_name
   }

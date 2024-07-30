@@ -57,8 +57,8 @@ module "lambda_api_function" {
 
   environment_variables = {
     "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pool.selected.domain}.auth.${data.aws_region.current.name}.amazoncognito.com",
-    "Data__ConnectionString"                     = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.db_name};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
-    "Data__PasswordSecretName"                   = var.rds_password_secret_name
+    "Data__ConnectionString"                     = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.names["${var.env}"]["db_name"]};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
+    "Data__PasswordSecretName"                   = var.names["${var.env}"]["rds_password_secret_name"]
   }
 
   provisioned_concurrent_executions = 2 # Set to 0 to disable

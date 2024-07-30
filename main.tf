@@ -61,7 +61,7 @@ module "lambda_api_function" {
     "Data__PasswordSecretName"                   = var.names["${var.env}"]["rds_password_secret_name"]
   }
 
-  provisioned_concurrent_executions = 2 # Set to 0 to disable
+  provisioned_concurrent_executions = var.names["${var.env}"]["provisioned_concurrent_executions"] # Set to 0 to disable
 
 }
 

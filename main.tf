@@ -41,7 +41,7 @@ data "aws_cognito_user_pool" "selected" {
 }
 
 module "lambda_api_function" {
-  source          = "github.com/PA-NIHR-CRN/terraform-modules//lambda?ref=v1.1.1"
+  source          = "github.com/PA-NIHR-CRN/terraform-modules//lambda?ref=v1.1.2"
   function_name   = "${var.names["${var.env}"]["accountidentifiers"]}-lambda-${var.env}-${var.names["system"]}-service"
   name_prefix     = var.names["${var.env}"]["accountidentifiers"]
   env             = var.env

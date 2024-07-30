@@ -23,7 +23,7 @@ module "profile_management_outbox_service_ecr" {
 }
 
 module "lambda_role" {
-  source  = "./modules/lambda_ima_role"
+  source  = "./modules/lambda_iam_role"
   env     = var.env
   system  = var.names["system"]
   account = var.names["${var.env}"]["accountidentifiers"]

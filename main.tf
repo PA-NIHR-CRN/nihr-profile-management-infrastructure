@@ -31,13 +31,6 @@ module "lambda_role" {
   account = var.names["${var.env}"]["accountidentifiers"]
 }
 
-module "ecs_role" {
-  source  = "./modules/ecs_iam_role"
-  env     = var.env
-  system  = var.names["system"]
-  account = var.names["${var.env}"]["accountidentifiers"]
-}
-
 # Cognito
 data "aws_cognito_user_pools" "cognito" {
   name = var.names["${var.env}"]["cognito_user_pool_name"]

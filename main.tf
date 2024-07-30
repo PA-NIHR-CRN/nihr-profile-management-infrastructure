@@ -37,7 +37,7 @@ data "aws_cognito_user_pools" "cognito" {
 }
 
 data "aws_cognito_user_pool" "selected" {
-  user_pool_id = data.aws_cognito_user_pools.cognito.id
+  user_pool_id = tolist(data.aws_cognito_user_pools.cognito.ids)[0]
 }
 
 module "lambda_api_function" {

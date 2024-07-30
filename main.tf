@@ -35,14 +35,14 @@ data "aws_cognito_user_pools" "selected" {
 
 module "lambda_api_function" {
   source          = "github.com/PA-NIHR-CRN/terraform-modules//lambda?ref=v1.1.1"
-  function_name   = "${var.account}-lambda-${var.env}-${var.system}-service"
+  function_name   = "${var.names["${var.env}"]["accountidentifiers"]}-lambda-${var.env}-${var.names["system"]}-service"
   name_prefix     = var.names["${var.env}"]["accountidentifiers"]
   env             = var.env
-  system          = var.system
+  system          = var.names["system"]
   timeout         = 30
-  vpc_id          = var.vpc_id
-  subnet_ids      = var.private_subnet_ids
-  memory_size     = var.memory_size
+  vpc_id          = var.names["${var.env}"]["vpcid"]
+  subnet_ids      = var.names["${var.env}"]["private_subnet_ids"]
+  memory_size     = var.names["${var.env}"]["lambda_memory"]
   handler         = "NIHR.ProfileManagement.Api::NIHR.ProfileManagement.Api.LambdaEntryPoint::FunctionHandlerAsync"
   filename        = "./modules/.build/lambda_dummy/lambda_dummy.zip"
   lambda_role_arn = module.lambda_role.lambda_execution_role_arn
@@ -56,10 +56,6 @@ module "lambda_api_function" {
 
   provisioned_concurrent_executions = 2 # Set to 0 to disable
 
-  tags = {
-    Environment = var.env
-    System      = var.system
-  }
 }
 
 data "aws_secretsmanager_secret" "terraform_secret" {
@@ -94,7 +90,7 @@ module "rds_aurora" {
   log_types               = var.names["${var.env}"]["log_types"]
   publicly_accessible     = var.names["${var.env}"]["publicly_accessible"]
   add_scheduler_tag       = var.names["${var.env}"]["add_scheduler_tag"]
-  lambda_sg               = module.lambda_api_function.lambda_sg
+  lambda_sg               = module.lambda_api_function.lambda_sg_id
   #   signup_lambda_sg        = module.lambda.signup_lambda_sg
   #   ecs_sg                  = module.outbox_processor_ecs.ecs_sg
   ingress_rules     = jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["ingress_rules"]

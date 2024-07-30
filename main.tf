@@ -29,8 +29,13 @@ module "lambda_role" {
   account = var.names["${var.env}"]["accountidentifiers"]
 }
 
-data "aws_cognito_user_pools" "selected" {
+# Cognito
+data "aws_cognito_user_pools" "cognito" {
   name = var.names["${var.env}"]["cognito_user_pool_name"]
+}
+
+data "aws_cognito_user_pool" "selected" {
+  user_pool_id = data.aws_cognito_user_pools.cognito.id
 }
 
 module "lambda_api_function" {
@@ -49,7 +54,7 @@ module "lambda_api_function" {
   runtime         = "dotnet8"
 
   environment_variables = {
-    "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pools.selected.endpoint}",
+    "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pool.selected.endpoint}",
     "Data__ConnectionString"                     = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.db_name};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
     "Data__PasswordSecretName"                   = var.rds_password_secret_name
   }

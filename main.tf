@@ -75,7 +75,7 @@ module "lambda_cognito_signup_function" {
   vpc_id          = var.names["${var.env}"]["vpcid"]
   subnet_ids      = var.names["${var.env}"]["private_subnet_ids"]
   memory_size     = var.names["${var.env}"]["lambda_memory"]
-  handler         = "NIHR.ProfileManagement.Api::NIHR.ProfileManagement.Api.LambdaEntryPoint::FunctionHandlerAsync"
+  handler         = "NIHR.ProfileManagement.CognitoSignUpTrigger::NIHR.PM.Signup.Function_FunctionHandler_Generated::FunctionHandler"
   filename        = "./modules/.build/lambda_dummy/lambda_dummy.zip"
   lambda_role_arn = module.lambda_role.lambda_execution_role_arn
   runtime         = "dotnet8"
@@ -126,42 +126,6 @@ module "rds_aurora" {
   #   ecs_sg                  = module.outbox_processor_ecs.ecs_sg
   ingress_rules     = jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["ingress_rules"]
   apply_immediately = var.names["${var.env}"]["apply_immediately"]
-}
-
-data "aws_ecr_image" "outbox_processor_image" {
-  repository_name = "nihrd-dev-profile-management-outbox-service-ecr"
-  most_recent     = true
-}
-
-module "outbox_processor_ecs" {
-  source               = "./modules/ecs"
-  account              = var.names["${var.env}"]["accountidentifiers"]
-  name                 = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-ecs-outbox-processor"
-  env                  = var.env
-  system               = var.names["system"]
-  vpc_id               = var.names["${var.env}"]["vpcid"]
-  instance_count       = var.names["${var.env}"]["ecs_instance_count"]
-  ecs_subnets          = (var.names["${var.env}"]["private_subnet_ids"])
-  container_name       = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-outbox-container"
-  image_url            = data.aws_ecr_image.outbox_processor_image.image_uri
-  bootstrap_servers    = var.names["${var.env}"]["bootstrap_servers"]
-  ecs_cpu              = var.names["${var.env}"]["ecs_cpu"]
-  ecs_memory           = var.names["${var.env}"]["ecs_memory"]
-  message_bus_topic    = var.names["${var.env}"]["message_bus_topic"]
-  sleep_interval       = var.names["${var.env}"]["sleep_interval"]
-  db_password          = var.names["${var.env}"]["rds_password_secret_name"]
-  rds_cluster_endpoint = module.rds_aurora.aurora_db_endpoint
-  db_name              = var.names["${var.env}"]["db_name"]
-  db_username          = jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]
-  rds_sg               = module.rds_aurora.rds_sg
-}
-
-module "ecs_autoscaling" {
-  source  = "./modules/autoscaling_group"
-  env     = var.env
-  system  = var.names["system"]
-  app     = var.names["app"]
-  account = var.names["${var.env}"]["accountidentifiers"]
 }
 
 

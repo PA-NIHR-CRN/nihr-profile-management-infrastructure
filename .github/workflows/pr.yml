@@ -41,6 +41,10 @@ jobs:
       run: |
            terraform fmt
 
-    - name: Terraform Plan
+    - name: Plan Destruction
       run: |
-           terraform plan -var="env=dev" 
+           terraform plan -destroy -var="env=dev" 
+
+    # - name: Terraform Plan
+    #   run: |
+    #        terraform plan -var="env=dev" 

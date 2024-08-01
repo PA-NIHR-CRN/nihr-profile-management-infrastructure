@@ -8,13 +8,124 @@ terraform {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
-module "profile_management_ecr" {
-  source    = "github.com/PA-NIHR-CRN/terraform-modules//ecr?ref=v1.0.0"
-  repo_name = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-ecr-repository"
-  env       = var.env
-  app       = var.names["${var.env}"]["app"]
-}
+
+# module "profile_management_outbox_service_ecr" {
+#   source    = "github.com/PA-NIHR-CRN/terraform-modules//ecr?ref=v1.1.0"
+#   repo_name = "${var.names["${var.env}"]["accountidentifiers"]}-${var.env}-${var.names["system"]}-outbox-service-ecr"
+#   env       = var.env
+#   app       = var.names["${var.env}"]["app"]
+#   account   = var.names["${var.env}"]["accountidentifiers"]
+#   system    = var.names["system"]
+# }
+
+# module "lambda_role" {
+#   source  = "./modules/lambda_iam_role"
+#   env     = var.env
+#   system  = var.names["system"]
+#   account = var.names["${var.env}"]["accountidentifiers"]
+# }
+
+# # Cognito
+# data "aws_cognito_user_pools" "cognito" {
+#   name = var.names["${var.env}"]["cognito_user_pool_name"]
+# }
+
+# data "aws_cognito_user_pool" "selected" {
+#   user_pool_id = tolist(data.aws_cognito_user_pools.cognito.ids)[0]
+# }
+
+# module "lambda_api_function" {
+#   source          = "github.com/PA-NIHR-CRN/terraform-modules//lambda?ref=v1.1.2"
+#   function_name   = "${var.names["${var.env}"]["accountidentifiers"]}-lambda-${var.env}-${var.names["system"]}-service"
+#   name_prefix     = var.names["${var.env}"]["accountidentifiers"]
+#   env             = var.env
+#   system          = var.names["system"]
+#   timeout         = 30
+#   vpc_id          = var.names["${var.env}"]["vpcid"]
+#   subnet_ids      = var.names["${var.env}"]["private_subnet_ids"]
+#   memory_size     = var.names["${var.env}"]["lambda_memory"]
+#   handler         = "NIHR.ProfileManagement.Api::NIHR.ProfileManagement.Api.LambdaEntryPoint::FunctionHandlerAsync"
+#   filename        = "./modules/.build/lambda_dummy/lambda_dummy.zip"
+#   lambda_role_arn = module.lambda_role.lambda_execution_role_arn
+#   runtime         = "dotnet8"
+
+#   environment_variables = {
+#     "ProfileManagementApi__JwtBearer__Authority" = "https://${data.aws_cognito_user_pool.selected.domain}.auth.${data.aws_region.current.name}.amazoncognito.com",
+#     "Data__ConnectionString"                     = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.names["${var.env}"]["db_name"]};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
+#     "Data__PasswordSecretName"                   = var.names["${var.env}"]["rds_password_secret_name"]
+#   }
+
+#   provisioned_concurrent_executions = var.names["${var.env}"]["provisioned_concurrent_executions"] # Set to 0 to disable
+
+# }
+
+# module "lambda_cognito_signup_function" {
+#   source          = "github.com/PA-NIHR-CRN/terraform-modules//lambda?ref=v1.1.2"
+#   function_name   = "${var.names["${var.env}"]["accountidentifiers"]}-lambda-${var.env}-${var.names["system"]}-cognito-signup-service"
+#   name_prefix     = var.names["${var.env}"]["accountidentifiers"]
+#   env             = var.env
+#   system          = var.names["system"]
+#   timeout         = 30
+#   vpc_id          = var.names["${var.env}"]["vpcid"]
+#   subnet_ids      = var.names["${var.env}"]["private_subnet_ids"]
+#   memory_size     = var.names["${var.env}"]["lambda_memory"]
+#   handler         = "NIHR.ProfileManagement.CognitoSignUpTrigger::NIHR.PM.Signup.Function_FunctionHandler_Generated::FunctionHandler"
+#   filename        = "./modules/.build/lambda_dummy/lambda_dummy.zip"
+#   lambda_role_arn = module.lambda_role.lambda_execution_role_arn
+#   runtime         = "dotnet8"
+
+#   environment_variables = {
+#     "Data__ConnectionString"   = "server=${module.rds_aurora.aurora_db_endpoint};database=${var.names["${var.env}"]["db_name"]};user=${jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]}",
+#     "Data__PasswordSecretName" = var.names["${var.env}"]["rds_password_secret_name"]
+#   }
+
+#   provisioned_concurrent_executions = var.names["${var.env}"]["provisioned_concurrent_executions"] # Set to 0 to disable
+
+# }
+
+# data "aws_secretsmanager_secret" "terraform_secret" {
+#   name = "${var.names["${var.env}"]["accountidentifiers"]}-secret-${var.env}-${var.names["system"]}-terraform"
+# }
+
+# data "aws_secretsmanager_secret_version" "terraform_secret_version" {
+#   secret_id = data.aws_secretsmanager_secret.terraform_secret.id
+# }
+
+# ## RDS DB
+# module "rds_aurora" {
+#   source                  = "./modules/auroradb"
+#   account                 = var.names["${var.env}"]["accountidentifiers"]
+#   env                     = var.env
+#   system                  = var.names["system"]
+#   app                     = var.names["${var.env}"]["app"]
+#   vpc_id                  = var.names["${var.env}"]["vpcid"]
+#   engine                  = var.names["${var.env}"]["engine"]
+#   engine_version          = var.names["${var.env}"]["engine_version"]
+#   instance_class          = var.names["${var.env}"]["instanceclass"]
+#   backup_retention_period = var.names["${var.env}"]["backupretentionperiod"]
+#   maintenance_window      = var.names["${var.env}"]["maintenancewindow"]
+#   subnet_group            = "${var.names["${var.env}"]["accountidentifiers"]}-rds-sng-${var.env}-public"
+#   db_name                 = "profile_management"
+#   username                = jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["db-username"]
+#   instance_count          = var.names["${var.env}"]["rds_instance_count"]
+#   az_zones                = var.names["${var.env}"]["az_zones"]
+#   min_capacity            = var.names["${var.env}"]["min_capacity"]
+#   max_capacity            = var.names["${var.env}"]["max_capacity"]
+#   skip_final_snapshot     = var.names["${var.env}"]["skip_final_snapshot"]
+#   log_types               = var.names["${var.env}"]["log_types"]
+#   publicly_accessible     = var.names["${var.env}"]["publicly_accessible"]
+#   add_scheduler_tag       = var.names["${var.env}"]["add_scheduler_tag"]
+#   lambda_sg               = module.lambda_api_function.lambda_sg_id
+#   #   signup_lambda_sg        = module.lambda.signup_lambda_sg
+#   #   ecs_sg                  = module.outbox_processor_ecs.ecs_sg
+#   ingress_rules     = jsondecode(data.aws_secretsmanager_secret_version.terraform_secret_version.secret_string)["ingress_rules"]
+#   apply_immediately = var.names["${var.env}"]["apply_immediately"]
+# }
+
+

@@ -64,10 +64,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       
-    - name: Setup Terraform
-      uses: autero1/action-terraform@v1.1.0
+    # Install Terraform
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.10.4
 
-      
     - name: Terraform Init ${{ github.event.inputs.environment }}
       run: |
            terraform init ${{ env.INIT_FLAG }}
